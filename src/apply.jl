@@ -71,7 +71,7 @@ end
 function _apply!(stab::QuantumClifford.Stabilizer{QuantumClifford.Tableau{Tz, Tm}},
     op::SingleQubitOperator;
     phases::Val{B}=Val(true)) where {B, Tz<:AbstractArray{<:Unsigned}, Tm<:CuArray{<:Unsigned, 2}}
-
+    # todo how to use phases similar to before in kernel functions??!
     threads_count = 1024 # Change this later
     rows::Unsigned = size(stab, 2)
     blocks_count = ceil(Int, rows/threads_count)
