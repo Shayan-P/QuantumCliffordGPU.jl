@@ -35,7 +35,8 @@ end
 function single_qubit_gpu_kernel(xzs::CuDeviceMatrix{UInt64, 1},
                                  phases::CuDeviceVector{UInt8, 1},
                                  op::SingleQubitOperator,
-                                 rows::Unsigned)
+                                 rows::Unsigned,
+                                 compute_phases::Bool=true)
     idx = (blockIdx().x - 1) * blockDim().x + threadIdx().x
     if idx > rows
         return nothing
@@ -53,28 +54,31 @@ function single_qubit_gpu_kernel(xzs::CuDeviceMatrix{UInt64, 1},
     setxbit(xzs, r, c, (x&xx)⊻(z&zx))
     setzbit(xzs, r, c, (x&xz)⊻(z&zz))
 
-    if op.px && ~iszero(x)
-        phases[r] += 0x2
-        phases[r] &= 3
-    end
-    if op.pz && ~iszero(z)
-        phases[r] += 0x2
-        phases[r] &= 3
-    end
-    if ~iszero(x&z) && anticom
-        phases[r] += 0x2
-        phases[r] &= 3
+    if compute_phases
+        if op.px && ~iszero(x)
+            phases[r] += 0x2
+            phases[r] &= 3
+        end
+        if op.pz && ~iszero(z)
+            phases[r] += 0x2
+            phases[r] &= 3
+        end
+        if ~iszero(x&z) && anticom
+            phases[r] += 0x2
+            phases[r] &= 3
+        end
     end
     return nothing
 end
 
 function _apply!(stab::QuantumClifford.Stabilizer{QuantumClifford.Tableau{Tz, Tm}},
     op::SingleQubitOperator;
-    phases::Val{B}=Val(true)) where {B, Tz<:CuArray{<:Unsigned, 1}, Tm<:CuArray{<:Unsigned, 2}}
+    compute_phases::Bool=true) where {Tz<:CuArray{<:Unsigned, 1}, Tm<:CuArray{<:Unsigned, 2}}
     # todo how to use phases similar to before in kernel functions??!
     threads_count = 1024 # Change this later
     rows::Unsigned = size(stab, 2)
     blocks_count = ceil(Int, rows/threads_count)
     tab = stab.tab
-    CUDA.@sync @cuda threads=threads_count blocks=blocks_count single_qubit_gpu_kernel(tab.xzs, tab.phases, op, rows)
+    # todo. why can't I pass compute_phases=compute_phases normally without function call?
+    CUDA.@sync @cuda threads=threads_count blocks=blocks_count single_qubit_gpu_kernel(tab.xzs, tab.phases, op, rows, compute_phases)
 end
