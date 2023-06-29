@@ -1,3 +1,7 @@
+# const InnerGPUType = UInt64;
+# todo. make the conversion types consiting with this...
+# also define a cpu default type?!
+
 to_gpu(array::AbstractArray) = CuArray(array);
 
 to_cpu(array::CuArray{T, 0}) where{T} = Array(array);

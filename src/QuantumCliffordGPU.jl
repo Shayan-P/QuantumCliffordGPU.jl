@@ -5,7 +5,8 @@ using CUDA
 
 include("adapters.jl")
 include("apply.jl")
+# include("pauli_frames.jl");
 
 export to_cpu, to_gpu, _apply!
-# hide _apply function later. only for internal use
+# todo hide _apply function later. only for internal use
 end
