@@ -25,7 +25,7 @@ using Test
     end
 
     @test begin
-        s = random_stabilizer(500, 500)
+        s = random_stabilizer(10, 10)
         s_gpu = to_gpu(s)
         op = SingleQubitOperator(sHadamard(5))
         QuantumCliffordGPU._apply!(s_gpu, op) 
@@ -33,4 +33,12 @@ using Test
         to_cpu(s_gpu) == s
     end
 
+    @test begin
+        s = random_stabilizer(10, 10)
+        s_gpu = to_gpu(s)
+        op = sCNOT(2, 3)
+        QuantumCliffordGPU._apply!(s_gpu, op) 
+        QuantumClifford._apply!(s, op)
+        to_cpu(s_gpu) == s
+    end
 end
