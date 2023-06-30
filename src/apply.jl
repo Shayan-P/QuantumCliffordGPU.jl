@@ -107,13 +107,13 @@ end
 
 function _apply!(stab::QuantumClifford.Stabilizer, 
                  gate::G; 
-                 compute_phases::Bool=true) where {G<:QuantumClifford.AbstractTwoQubitOperator}
+                 phases::Val{B}=Val(true)) where {B, G<:QuantumClifford.AbstractTwoQubitOperator}
     threads_count = 1024 # Change this later
     rows::Unsigned = size(stab, 2)
     blocks_count = ceil(Integer, rows/threads_count)
     tab = QuantumClifford.tab(stab)
     # todo. why can't I pass compute_phases=compute_phases normally without function call?
-    CUDA.@sync @cuda threads=threads_count blocks=blocks_count two_qubit_gpu_kernel(tab.xzs, tab.phases, gate, rows, compute_phases)
+    CUDA.@sync @cuda threads=threads_count blocks=blocks_count two_qubit_gpu_kernel(tab.xzs, tab.phases, gate, rows, B)
 
     # todo dry this out...!
 end
