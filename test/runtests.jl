@@ -41,4 +41,10 @@ using Test
         QuantumClifford._apply!(s, op)
         to_cpu(s_gpu) == s
     end
+
+    @test begin
+        circuite = [sHadamard(2), sHadamard(5), sCNOT(1, 2), sCNOT(2, 5), sMRZ(1), sMRZ(2), sMZ(4), sMZ(5)]
+        QuantumCliffordGPU.pftrajectories(circuite; trajectories=10_000)
+        true # todo how to write test for pftrajectories since the result is randomized. can we compare distribution?...
+    end
 end
