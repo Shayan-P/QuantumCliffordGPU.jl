@@ -7,7 +7,7 @@ function apply_sMZ_kernel!(xzs::CuDeviceMatrix{Tme, 1},
                           measurements::CuDeviceMatrix{Bool, 1},
                           op::sMZ,
                           ibig::Int,
-                          ismallm::Int,
+                          ismallm::Tme,
                           rows::Int) where {Tme <: Unsigned} 
     f = (blockIdx().x - 1) * blockDim().x + threadIdx().x;
     if f > rows
@@ -41,7 +41,7 @@ function apply_sMRZ_kernel!(xzs::CuDeviceMatrix{Tme, 1},
                           measurements::CuDeviceMatrix{Bool, 1},
                           op::QuantumClifford.sMRZ,
                           ibig::Int, # todo change to Int
-                          ismallm::Int,
+                          ismallm::Tme,
                           rows::Int) where {Tme <: Unsigned} 
     f = (blockIdx().x - 1) * blockDim().x + threadIdx().x;
     if f > rows
