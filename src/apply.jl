@@ -66,7 +66,7 @@ function _apply!(stab::QuantumClifford.Stabilizer{QuantumClifford.Tableau{Tz, Tm
     phases::Val{B}=Val(true)) where {B, Tz<:CuArray{<:Unsigned, 1}, Tm<:CuArray{<:Unsigned, 2}}
     # todo how to use phases similar to before in kernel functions??!
     threads_count = 1024 # Change this later
-    rows::Unsigned = size(stab, 2)
+    rows::Unsigned = size(stab, 1)
     blocks_count = ceil(Int, rows/threads_count)
     tab = QuantumClifford.tab(stab)
     # todo. why can't I pass phases=compute_phases normally without function call?
@@ -109,7 +109,7 @@ function _apply!(stab::QuantumClifford.Stabilizer,
                  gate::G; 
                  phases::Val{B}=Val(true)) where {B, G<:QuantumClifford.AbstractTwoQubitOperator}
     threads_count = 1024 # Change this later
-    rows::Unsigned = size(stab, 2)
+    rows::Unsigned = size(stab, 1)
     blocks_count = ceil(Int, rows/threads_count)
     tab = QuantumClifford.tab(stab)
     # todo. why can't I pass compute_phases=compute_phases normally without function call?

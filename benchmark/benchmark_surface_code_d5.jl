@@ -1,6 +1,8 @@
 using QuantumClifford
 using QuantumCliffordGPU
 using BenchmarkTools
+using Plots
+using ProgressBars
 
 # QuantumClifford Program
 circ = [
@@ -1248,8 +1250,38 @@ circ = [
     sMZ(80, 0),
 ];
 
-@benchmark QuantumCliffordGPU.pftrajectories(circ; trajectories=10_000)
 
-@benchmark QuantumClifford.pftrajectories(circ; trajectories=10_000)
+function get_stats()
+    # Powers of 2 to benchmark
+    powers = 10:24
+    n_values = 2 .^ powers
 
-# note. this is also measuring the time it takes to move data to gpu
+    cpu_times = Float64[]
+    gpu_times = Float64[]
+    for n in ProgressBar(n_values)
+        time_cpu = @belapsed QuantumClifford.pftrajectories($circ; trajectories=$n)
+        push!(cpu_times, time_cpu)
+
+        # note. this is also measuring the time it takes to move data to gpu
+        time_gpu = @belapsed QuantumCliffordGPU.pftrajectories($circ; trajectories=$n)
+        push!(gpu_times, time_gpu)        
+    end
+    return n_values, cpu_times, gpu_times
+end
+
+n_values, cpu_times, gpu_times = get_stats()
+
+normal_plot = plot(n_values, cpu_times, marker=:circle, label="cpu", xlabel="n", ylabel="Execution Time (s)", xscale=:log2, minorgrid=true)
+plot!(n_values, gpu_times, marker=:circle, label="gpu", legend=:topleft)
+title!("pftrajectories comparison on GPU and CPU")
+xticks!(n_values[1:2:end])
+times = union(gpu_times, cpu_times)
+yticks!(times[times .> 7])
+savefig("benchmark_surface_code_d5.png")
+
+log_plot = plot(n_values, cpu_times, marker=:circle, label="cpu", xlabel="n", ylabel="Execution Time (s)", xscale=:log2, yscale=:log10, minorgrid=true)
+plot!(n_values, gpu_times, marker=:circle, label="gpu", legend=:topleft)
+title!("pftrajectories comparison on GPU and CPU (log)")
+xticks!(n_values[1:2:end])
+savefig("benchmark_surface_code_d5(log_scale).png")
+
