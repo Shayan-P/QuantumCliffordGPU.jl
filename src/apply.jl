@@ -1,21 +1,21 @@
 Base.@propagate_inbounds function getxbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer)::T where {T <: Unsigned}
-    xzs[QuantumClifford.getbigindex(T, c),r]&(QuantumClifford.getmask(T, c)::T) # todo getmask is not type stable...
+    xzs[QuantumClifford.getbigindex(T, c),r] & QuantumClifford.getmask(T, c)
 end
 Base.@propagate_inbounds function getzbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer)::T where {T <: Unsigned}
-    xzs[end÷2+QuantumClifford.getbigindex(T, c),r]&(QuantumClifford.getmask(T, c)::T) # todo getmask is not type stable...
+    xzs[end÷2+QuantumClifford.getbigindex(T, c),r]& QuantumClifford.getmask(T, c)
 end
-Base.@propagate_inbounds function setxbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer, x::O) where {T <: Unsigned, O <: T}
+Base.@propagate_inbounds function setxbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer, x::T) where {T <: Unsigned}
     cbig = QuantumClifford.getbigindex(T, c)
     xzs[cbig,r] &= ~QuantumClifford.getmask(T, c)
     xzs[cbig,r] |= x
 end
-Base.@propagate_inbounds function setzbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer, z::O) where {T <: Unsigned, O <: T}
+Base.@propagate_inbounds function setzbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer, z::T) where {T <: Unsigned}
     cbig = QuantumClifford.getbigindex(T, c)
     xzs[end÷2+cbig,r] &= ~QuantumClifford.getmask(T, c)
     xzs[end÷2+cbig,r] |= z
 end
-Base.@propagate_inbounds setxbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer, x::O, shift::Integer) where {T <: Unsigned, O <: T} = setxbit(xzs, r, c, x<<shift)
-Base.@propagate_inbounds setzbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer, z::O, shift::Integer) where {T <: Unsigned, O <: T} = setzbit(xzs, r, c, z<<shift)
+Base.@propagate_inbounds setxbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer, x::T, shift::Integer) where {T <: Unsigned} = setxbit(xzs, r, c, x<<shift)
+Base.@propagate_inbounds setzbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer, z::T, shift::Integer) where {T <: Unsigned} = setzbit(xzs, r, c, z<<shift)
 
 # todo put back the generic types later
 # Questions:

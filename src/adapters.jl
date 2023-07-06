@@ -31,7 +31,7 @@ to_cpu(stabilizer::QuantumClifford.Stabilizer) =
     Stabilizer(to_cpu(tab(stabilizer)))
 
 to_gpu(pauli_frame::QuantumClifford.PauliFrame) =
-    PauliFrame(to_gpu(pauli_frame.frame), to_gpu(pauli_frame.measurements))
+    QuantumClifford.PauliFrame(to_gpu(pauli_frame.frame), to_gpu(pauli_frame.measurements))
 
 to_cpu(pauli_frame::QuantumClifford.PauliFrame) =
-    PauliFrame(to_cpu(pauli_frame.frame), to_cpu(pauli_frame.measurements))
+    QuantumClifford.PauliFrame(to_cpu(pauli_frame.frame), to_cpu(pauli_frame.measurements))

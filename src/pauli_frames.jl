@@ -40,7 +40,7 @@ end
 function apply_sMRZ_kernel!(xzs::CuDeviceMatrix{Tme, 1},
                           measurements::CuDeviceMatrix{Bool, 1},
                           op::QuantumClifford.sMRZ,
-                          ibig::Integer,
+                          ibig::Integer, # todo change to Int
                           ismallm::Integer,
                           rows::Integer) where {Tme <: Unsigned} 
     f = (blockIdx().x - 1) * blockDim().x + threadIdx().x;
@@ -92,7 +92,7 @@ function pftrajectories(circuit;trajectories=5000)
     return frames
 end
 
-function pftrajectories(state::PauliFrame, circuit)
+function pftrajectories(state::QuantumClifford.PauliFrame, circuit)
     for op in circuit
         apply!(state, op)
     end
