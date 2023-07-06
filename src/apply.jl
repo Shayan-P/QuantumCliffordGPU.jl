@@ -1,21 +1,21 @@
-Base.@propagate_inbounds function getxbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer)::T where {T <: Unsigned}
+Base.@propagate_inbounds function getxbit(xzs::CuDeviceMatrix{T, 1}, r::Int, c::Int)::T where {T <: Unsigned}
     xzs[QuantumClifford.getbigindex(T, c),r] & QuantumClifford.getmask(T, c)
 end
-Base.@propagate_inbounds function getzbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer)::T where {T <: Unsigned}
+Base.@propagate_inbounds function getzbit(xzs::CuDeviceMatrix{T, 1}, r::Int, c::Int)::T where {T <: Unsigned}
     xzs[end÷2+QuantumClifford.getbigindex(T, c),r]& QuantumClifford.getmask(T, c)
 end
-Base.@propagate_inbounds function setxbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer, x::T) where {T <: Unsigned}
+Base.@propagate_inbounds function setxbit(xzs::CuDeviceMatrix{T, 1}, r::Int, c::Int, x::T) where {T <: Unsigned}
     cbig = QuantumClifford.getbigindex(T, c)
     xzs[cbig,r] &= ~QuantumClifford.getmask(T, c)
     xzs[cbig,r] |= x
 end
-Base.@propagate_inbounds function setzbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer, z::T) where {T <: Unsigned}
+Base.@propagate_inbounds function setzbit(xzs::CuDeviceMatrix{T, 1}, r::Int, c::Int, z::T) where {T <: Unsigned}
     cbig = QuantumClifford.getbigindex(T, c)
     xzs[end÷2+cbig,r] &= ~QuantumClifford.getmask(T, c)
     xzs[end÷2+cbig,r] |= z
 end
-Base.@propagate_inbounds setxbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer, x::T, shift::Integer) where {T <: Unsigned} = setxbit(xzs, r, c, x<<shift)
-Base.@propagate_inbounds setzbit(xzs::CuDeviceMatrix{T, 1}, r::Integer, c::Integer, z::T, shift::Integer) where {T <: Unsigned} = setzbit(xzs, r, c, z<<shift)
+Base.@propagate_inbounds setxbit(xzs::CuDeviceMatrix{T, 1}, r::Int, c::Int, x::T, shift::Int) where {T <: Unsigned} = setxbit(xzs, r, c, x<<shift)
+Base.@propagate_inbounds setzbit(xzs::CuDeviceMatrix{T, 1}, r::Int, c::Int, z::T, shift::Int) where {T <: Unsigned} = setzbit(xzs, r, c, z<<shift)
 
 # todo put back the generic types later
 # Questions:
@@ -67,7 +67,7 @@ function _apply!(stab::QuantumClifford.Stabilizer{QuantumClifford.Tableau{Tz, Tm
     # todo how to use phases similar to before in kernel functions??!
     threads_count = 1024 # Change this later
     rows::Unsigned = size(stab, 2)
-    blocks_count = ceil(Integer, rows/threads_count)
+    blocks_count = ceil(Int, rows/threads_count)
     tab = QuantumClifford.tab(stab)
     # todo. why can't I pass phases=compute_phases normally without function call?
     CUDA.@sync @cuda threads=threads_count blocks=blocks_count single_qubit_gpu_kernel(tab.xzs, tab.phases, op, rows, B)
@@ -110,7 +110,7 @@ function _apply!(stab::QuantumClifford.Stabilizer,
                  phases::Val{B}=Val(true)) where {B, G<:QuantumClifford.AbstractTwoQubitOperator}
     threads_count = 1024 # Change this later
     rows::Unsigned = size(stab, 2)
-    blocks_count = ceil(Integer, rows/threads_count)
+    blocks_count = ceil(Int, rows/threads_count)
     tab = QuantumClifford.tab(stab)
     # todo. why can't I pass compute_phases=compute_phases normally without function call?
     CUDA.@sync @cuda threads=threads_count blocks=blocks_count two_qubit_gpu_kernel(tab.xzs, tab.phases, gate, rows, B)

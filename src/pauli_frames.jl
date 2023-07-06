@@ -6,9 +6,9 @@ end
 function apply_sMZ_kernel!(xzs::CuDeviceMatrix{Tme, 1},
                           measurements::CuDeviceMatrix{Bool, 1},
                           op::sMZ,
-                          ibig::Integer,
-                          ismallm::Integer,
-                          rows::Integer) where {Tme <: Unsigned} 
+                          ibig::Int,
+                          ismallm::Int,
+                          rows::Int) where {Tme <: Unsigned} 
     f = (blockIdx().x - 1) * blockDim().x + threadIdx().x;
     if f > rows
         return nothing
@@ -30,7 +30,7 @@ function apply!(frame::QuantumClifford.PauliFrame, op::QuantumClifford.sMZ) # TO
 
 
     threads_count = 1024 # todo choose this wiser
-    blocks_count = ceil(Integer, length(frame)/threads_count)
+    blocks_count = ceil(Int, length(frame)/threads_count)
     # todo make this some kind of macro so that we don't need to write this all the time?!
     CUDA.@sync @cuda threads=threads_count blocks=blocks_count apply_sMZ_kernel!(xzs, frame.measurements, op, ibig, ismallm, length(frame))
 
@@ -40,9 +40,9 @@ end
 function apply_sMRZ_kernel!(xzs::CuDeviceMatrix{Tme, 1},
                           measurements::CuDeviceMatrix{Bool, 1},
                           op::QuantumClifford.sMRZ,
-                          ibig::Integer, # todo change to Int
-                          ismallm::Integer,
-                          rows::Integer) where {Tme <: Unsigned} 
+                          ibig::Int, # todo change to Int
+                          ismallm::Int,
+                          rows::Int) where {Tme <: Unsigned} 
     f = (blockIdx().x - 1) * blockDim().x + threadIdx().x;
     if f > rows
         return nothing
@@ -66,7 +66,7 @@ function apply!(frame::QuantumClifford.PauliFrame, op::QuantumClifford.sMRZ) # T
     ismallm = lowbit<<(ismall)
 
     threads_count = 1024 # todo choose this wiser
-    blocks_count = ceil(Integer, length(frame)/threads_count)
+    blocks_count = ceil(Int, length(frame)/threads_count)
     # todo make this some kind of macro so that we don't need to write this all the time?!
     CUDA.@sync @cuda threads=threads_count blocks=blocks_count apply_sMRZ_kernel!(xzs, frame.measurements, op, ibig, ismallm, length(frame))
     return frame
