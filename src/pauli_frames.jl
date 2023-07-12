@@ -101,7 +101,6 @@ end
 
 # todo this is just a patch. remove it in the future...
 normalize_gate(gate::QuantumClifford.AbstractOperation) = gate
-normalize_gate(gate::QuantumClifford.AbstractOperation) = gate
 normalize_gate(gate::sHadamard) = SingleQubitOperator(gate)
 normalize_gate(gate::sPhase) = SingleQubitOperator(gate)
 normalize_gate(gate::sInvPhase) = SingleQubitOperator(gate)
